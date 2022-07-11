@@ -1,66 +1,96 @@
 #include<SoftwareSerial.h>
 #include <UTFT.h>
 #include <avr/pgmspace.h>
-UTFT myGLCD(QD_TFT180A,A2,A1,A5,A4,A3);  // Remember to change the model parameter to suit your display module!
-//SoftwareSerial mySerial(0,1);//RX,TX
-extern unsigned int mysquare[0x400];
-extern unsigned int white[0x38];
-//extern unsigned int tux[0x1000];
-extern unsigned int myfig[0x400];
-extern unsigned int circle[0x240];
-extern unsigned int line[0x100];
-char a;
-void setup()
-{
-   Serial.begin(9600);
-//    myGLCD.InitLCD(PORTRAIT);myGLCD.fillScr(0, 0, 0);
-  DDRD=0B11110000;  //  二进制顺序为D7--D0；1为输出，0为输入  
-//  PORTD=0B00000000; //  二进制顺序为D7--D0；1为高电平，0为低电平 
-}
 
-void loop()
+
+
+//曲子的节拍，即音符持续时间
+float duration[] =
 {
-     
-  if(Serial.available())
-    {
-   // myGLCD.fillScr(0, 0, 0); 
-      a=Serial.read();
-       Serial.println(a);
+  1, 1, 0.5, 0.5, 1,
+  0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5,
+  0.5, 1, 0.5, 1, 0.5, 0.5,
+  0.5, 0.5, 0.5, 0.5, 1, 1,
+
+  1, 1, 1 + 1,
+  0.5, 1, 1 + 0.5, 1,
+  1, 1, 0.5, 0.5, 1,
+  0.5, 1, 1 + 0.5, 1,
+  0.5, 0.5, 0.5, 0.5, 1 + 1,
+  0.5, 1, 1 + 0.5, 1,
+  1 + 1, 0.5, 0.5, 1,
+  1 + 1 + 1 + 1,
+  0.5, 0.5, 0.5 + 0.25, 0.25, 0.5 + 0.25, 0.25, 0.5 + 0.25, 0.25,
+  0.5, 1, 0.5, 1, 1,
+  0.5, 0.5, 0.5 + 0.25, 0.25, 0.5 + 0.25, 0.25, 0.5 + 0.25, 0.25,
+  0.5, 1, 0.5, 1, 1,
+  1 + 1, 0.5, 0.5, 1,
+  1 + 1 + 1 + 1,
+  0.5, 1, 0.5, 1 + 1,
+  0.5, 1, 0.5, 1 + 1,
+  1 + 1, 0.5, 0.5, 1,
+  1 + 1 + 1 + 1
+};
+
+int length;//定义一个变量用来表示共有多少个音符
+char a;
+int begin_time;
+void check_a(char a){
       switch (a){
         case '1':
           Serial.println("draw1");
-           PORTD=0B11110000; //  二进制顺序为D7--D0；1为高电平，0为低电平 
-           delay(100);
-            PORTD=0B00000000; //  二进制顺序为D7--D0；1为高电平，0为低电平 
-        //  digitalWrite(7, HIGH);   // 
-        //  delay(100);
-        //  digitalWrite(7, LOW);
+          digitalWrite(7, HIGH);   // 
+          delay(50);
+          digitalWrite(7, LOW);
           break;
         case '2':
           Serial.println("draw2");
           digitalWrite(6, HIGH);   // 
-          delay(100);
+          delay(50);
           digitalWrite(6, LOW);
           break;
         case '3':
           Serial.println("draw3");
           digitalWrite(5, HIGH);   // 
-          delay(100);
+          delay(50);
           digitalWrite(5, LOW);
           break;
         case '4':
-          Serial.println("draw4");
-          digitalWrite(4, HIGH);   // 
-          delay(100);
-          digitalWrite(4, LOW);
-          break;
+            Serial.println("draw4");
+            digitalWrite(4, HIGH);   // 
+            delay(50);
+            digitalWrite(4, LOW);
+            break;
         default:
           Serial.println("default");
+          delay(50);
           break;
-      
       }
-            
-     }   
+}
+void setup()
+{
+   Serial.begin(9600);
+
+  DDRD=0B11110000;  //  二进制顺序为D7--D0；1为输出，0为输入  
+//  PORTD=0B00000000; //  二进制顺序为D7--D0；1为高电平，0为低电平 
+  length = sizeof(duration) / sizeof(duration[0]); //这里用了一个sizeof函数，查出数组里有多少个音符
+}
+
+void loop()
+{
+  if(a!='s'){
+    if(Serial.available()){a=Serial.read();Serial.println(a);}
+  
+  }
+ //   else{Serial.println("waiting...");}
+    if(a=='s'){
+          begin_time=millis();
+          Serial.println(begin_time);
+          while(1){
+              if(Serial.available()){a=Serial.read();Serial.println(a);check_a(a);}
+          }
+    }
+    
 
 }
 
