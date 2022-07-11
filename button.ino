@@ -1,3 +1,4 @@
+//hello
 int key_up = 2;
 int key_down = 3;
 int key_choose = 4;
