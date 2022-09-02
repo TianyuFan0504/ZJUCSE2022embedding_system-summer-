@@ -7,10 +7,13 @@ void setup()
 void loop()
 {
     if (mode == 0) // reset后的初始状态
-    {
-        Serial0Read0();     //读取上位机的信息
-        ChangeArguments0(); //根据读到的参数来改变参数(mode,还有屏幕要显示的内容)
-        Serial0Write0();    //给上位机发消息，确认模式已经改变
+    {   
+        ReadKey();          //读取按键状态
+        KeepListening();    //持续读取上位机信息，读到大写Z退出
+        // Serial0Read0();     //读取上位机的信息
+        // ChangeArguments0(); //根据读到的参数来改变参数(mode,还有屏幕要显示的内容)
+        // Serial0Write0();    //给上位机发消息，确认模式已经改变
+        //Write函数会在KeepListening()函数中被调用，逻辑是收到上位机的信号之后立刻返回对应的值
     }
     else if (mode == 1) //自由模式
     {
